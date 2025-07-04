@@ -40,10 +40,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'books',
+    'corsheaders',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,11 +55,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'bookbuddy_backend.urls'
 
@@ -130,4 +135,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5186",
+]
 

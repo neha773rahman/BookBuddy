@@ -1,29 +1,39 @@
 from rest_framework import serializers
 from .models import Book, Progress, Review
-from django.contrib.auth.models import User
 
-
-class BookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Book
-        fields = '__all__'
-        read_only_fields = ['user']
 
 class ProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Progress
-        fields = '__all__'
+        fields = ['id', 'book', 'percent_completed', 'updated_at']
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
+        fields = ['id', 'book', 'rating', 'notes', 'created_at']
+
+    def validate(self, data):
+        if not data.get('rating') and not data.get('notes'):
+            raise serializers.ValidationError("Either rating or notes must be provided.")
+        return data
+
+class BookSerializer(serializers.ModelSerializer):
+    review = ReviewSerializer(read_only=True)  # nested review
+
+    class Meta:
+        model = Book
         fields = '__all__'
 
-class RegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+class BookDetailSerializer(serializers.ModelSerializer):
+    review = ReviewSerializer(read_only=True)
 
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'author', 'genre', 'status', 'total_pages', 'review']
+
+class ProgressHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Progress
+        fields = ['updated_at', 'percent_completed']
+
